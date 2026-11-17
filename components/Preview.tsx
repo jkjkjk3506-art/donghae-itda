@@ -61,11 +61,12 @@ export default function Preview({ image, workName }: { image: string; workName: 
   }
 
   return (
-    <section>
-      <h2>🎨 공사 후 모습 미리보기</h2>
+    <section id="s-preview">
+      <h2><span className="n">5</span>공사 후 모습 미리보기</h2>
+      <p className="sub">색을 직접 바꿔 보거나, AI가 만든 예시 이미지로 미리 볼 수 있어요.</p>
       <div className="grid g2">
         <div className="card">
-          <h3>① 색 바꿔보기 (바로)</h3>
+          <h3>색 바꿔보기 (바로)</h3>
           <p className="small muted">색을 고르고 사진에서 벽을 눌러 보세요.</p>
           <div className="row" style={{ marginBottom: 10 }}>
             {COLORS.map((c) => <button key={c} aria-label={c} className={`swatch ${c === color ? "on" : ""}`} style={{ background: c }} onClick={() => setColor(c)} />)}
@@ -74,7 +75,7 @@ export default function Preview({ image, workName }: { image: string; workName: 
           <div className="canvasbox"><canvas ref={cv} onClick={tap} /></div>
         </div>
         <div className="card">
-          <h3>② AI로 공사 후 모습 보기</h3>
+          <h3>AI로 공사 후 모습 보기</h3>
           <p className="small muted">AI가 사진을 바탕으로 예시 이미지를 만들어요 (10~30초).</p>
           {!ai && <button className="btn sea" disabled={busy} onClick={genAI}>{busy ? "만드는 중…" : "AI 미리보기 만들기"}</button>}
           {msg && <p className="small" style={{ color: "var(--danger)" }}>{msg}</p>}

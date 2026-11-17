@@ -17,6 +17,7 @@ export default function ProPage() {
   const [progs, setProgs] = useState<Program[]>([]);
   const [legal, setLegal] = useState<LegalNote[]>([]);
   const [saved, setSaved] = useState("");
+  const [exp, setExp] = useState<{ mine: number; total: number; avg: number | null } | null>(null);
 
   useEffect(() => {
     if (profile?.role !== "contractor" || !profile.business_id) return;
@@ -25,6 +26,7 @@ export default function ProPage() {
     db.from("work_types").select("*").order("sort").then(({ data }) => setWorks((data || []) as WorkType[]));
     db.from("inquiries").select("*").order("created_at", { ascending: false }).then(({ data }) => setInq((data || []) as Inquiry[]));
     db.from("programs").select("*").eq("audience", "business").then(({ data }) => setProgs((data || []) as Program[]));
+    db.rpc("my_exposure").then(({ data }) => setExp(data));
     db.from("legal_notes").select("*").in("audience", ["contractor", "both"]).order("sort").then(({ data }) => setLegal((data || []) as LegalNote[]));
   }, [profile]);
 
@@ -47,9 +49,14 @@ export default function ProPage() {
 
   return (
     <main className="wrap">
-      <div className="hero">
-        <h1>{biz?.name || "내 업체"}</h1>
-        <p>{profile.display_name} · <button className="btn sm ghost" onClick={logout}>로그아웃</button></p>
+      <div className="pagehead row between">
+        <div><h1>{biz?.name || "내 업체"}</h1><p>{profile.display_name}</p></div>
+        <button className="btn sm ghost" onClick={logout}>로그아웃</button>
+      </div>
+      <div className="grid g3" style={{ marginBottom: 18 }}>
+        <div className="card"><div className="muted small">새 문의</div><div className="kpi">{inq.filter((x) => x.status === "new").length}</div><div className="small muted">전체 {inq.length}건</div></div>
+        <div className="card"><div className="muted small">최근 30일 시민 화면 소개</div><div className="kpi">{exp?.mine ?? "-"}회</div><div className="small muted">업체 평균 {exp?.avg ?? "-"}회 · 전체 상담 {exp?.total ?? "-"}건</div></div>
+        <div className="card"><div className="muted small">소개 방식</div><div className="small" style={{ marginTop: 6 }}>공정이 맞는 업체 중에서 매번 무작위로 소개돼요. 정보를 더 입력하거나 비용을 내도 순서가 올라가지 않아요.</div></div>
       </div>
       <div className="tabs">
         {[["inbox", `문의함 (${inq.filter((x) => x.status === "new").length})`], ["info", "내 업체 정보"], ["legal", "시공 법·안전"], ["support", "업체 지원사업"]].map(([k, l]) =>
@@ -57,7 +64,7 @@ export default function ProPage() {
       </div>
 
       {tab === "inbox" && (
-        <div className="card">
+        <div className="card scroll">
           {inq.length === 0 ? <p className="muted">아직 문의가 없어요. 시민 화면에서 이 업체에 문의를 보내 보세요.</p> :
             <table><thead><tr><th>받은 때</th><th>공사</th><th>동</th><th>이름·연락처</th><th>내용</th><th>상태</th></tr></thead>
               <tbody>{inq.map((q) => (
@@ -90,7 +97,10 @@ export default function ProPage() {
         </div>
       )}
 
-      {tab === "legal" && <LegalList notes={myLegal} title="내 공정에 해당하는 법·안전 기준" />}
+      {tab === "legal" && <>
+        <p className="sub">'내 업체 정보'에서 고른 공정에 해당하는 기준만 보여요. 공정 {myWorks.length}개 선택됨.</p>
+        <LegalList notes={myLegal} />
+      </>}
 
       {tab === "support" && (
         <>

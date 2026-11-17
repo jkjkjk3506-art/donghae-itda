@@ -8,7 +8,8 @@ export async function POST(req: Request) {
     const r = await runMatch({
       work_code: String(b.work_code), housing: String(b.housing), dong: b.dong || undefined,
       conditions: Array.isArray(b.conditions) ? b.conditions.map(String) : [],
-      channel: ["citizen", "counter", "demo"].includes(b.channel) ? b.channel : "citizen",
+      channel: b.channel === "counter" ? "counter" : "citizen",
+      floors: ["low", "high"].includes(b.floors) ? b.floors : undefined, consultation_id: b.consultation_id,
       input_text: b.input_text, has_photo: !!b.has_photo, diagnosis: b.diagnosis,
     });
     return NextResponse.json(r);

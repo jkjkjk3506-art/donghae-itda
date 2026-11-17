@@ -22,11 +22,16 @@ export type Business = {
 export type LegalNote = {
   code: string; work_codes: string[]; audience: string; level: "info" | "warn" | "danger";
   condition: string | null; title: string; body: string; law: string | null; sort: number;
+  applies?: boolean; // 입력한 조건으로 '내 경우 해당'이 확인된 항목
 };
 export type MatchResult = {
   consultation_id: string; work: WorkType; programs: Program[]; maybe_programs: { p: Program; why: string }[];
-  businesses: Business[]; legal: LegalNote[];
+  businesses: Business[]; legal: LegalNote[]; all_works: { code: string; name: string }[];
 };
+export const FLOORS = [
+  { v: "low", label: "1~2층" },
+  { v: "high", label: "3층 이상" },
+];
 export const HOUSING = [
   { v: "단독주택", label: "단독주택" },
   { v: "다가구다세대", label: "빌라·다세대" },
