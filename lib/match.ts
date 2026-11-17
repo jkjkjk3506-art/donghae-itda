@@ -54,9 +54,14 @@ export function pickBusinesses(all: Business[], work: WorkType) {
   return picked;
 }
 
-export function pickLegal(all: LegalNote[], work_code: string, audience: "citizen" | "contractor") {
+const HOUSING_ONLY: Record<string, string[]> = {
+  "L-APT": ["아파트단지", "다가구다세대"],
+  "L-KIDS-PAINT": ["어린이집", "지역아동센터"],
+};
+export function pickLegal(all: LegalNote[], work_code: string, audience: "citizen" | "contractor", housing?: string) {
   return all
     .filter((n) => (n.work_codes.includes("*") || n.work_codes.includes(work_code)) && (n.audience === "both" || n.audience === audience))
+    .filter((n) => !housing || !HOUSING_ONLY[n.code] || HOUSING_ONLY[n.code].includes(housing))
     .sort((a, b) => ({ danger: 0, warn: 1, info: 2 }[a.level] - { danger: 0, warn: 1, info: 2 }[b.level]) || a.sort - b.sort);
 }
 
@@ -72,7 +77,7 @@ export async function runMatch(inp: MatchInput): Promise<MatchResult> {
   const work = (w.data as WorkType[]).find((x) => x.code === inp.work_code) || (w.data as WorkType[]).find((x) => x.code === "OTHER")!;
   const { programs, maybe } = pickPrograms(p.data as Program[], work, inp);
   const businesses = pickBusinesses(b.data as Business[], work);
-  const legal = pickLegal(l.data as LegalNote[], work.code, inp.audience || "citizen");
+  const legal = pickLegal(l.data as LegalNote[], work.code, inp.audience || "citizen", inp.housing);
   const consultation_id = crypto.randomUUID();
   await db.from("consultations").insert({
     id: consultation_id, channel: inp.channel || "citizen", dong: inp.dong || null, housing: inp.housing,

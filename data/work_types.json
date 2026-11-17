@@ -1,16 +1,282 @@
 [
- {"code":"LEAK_ROOF","name":"옥상·지붕 누수 방수","plain_examples":["천장에서 물이 새요","옥상 바닥이 갈라졌어요","비 오면 천장에 얼룩"],"defect_hint":"옥상 방수층 노후·균열, 배수구 막힘","db_categories":["도장·방수·코킹","종합건설","종합·기타 시공"],"program_tags":["방수","지붕","집수리일반"],"license_note":"1,500만원 이상이면 도장·습식·방수·석공사업 면허 필요","sort":1},
- {"code":"WALL_CRACK","name":"외벽 균열·도장","plain_examples":["벽에 금이 갔어요","외벽 페인트가 벗겨져요","벽에서 가루가 떨어져요"],"defect_hint":"외벽 균열, 도막 박리, 백화","db_categories":["도장·방수·코킹","종합건설"],"program_tags":["외벽도장","집수리일반"],"license_note":"1,500만원 이상이면 도장·습식·방수·석공사업 면허 필요","sort":2},
- {"code":"WINDOW_LEAK","name":"창틀·실리콘 누수(코킹)","plain_examples":["창문 틈으로 물이 들어와요","창틀 실리콘이 까맣게 됐어요"],"defect_hint":"창호 주변 실링재 노후","db_categories":["도장·방수·코킹","창호·유리·금속"],"program_tags":["방수","창호"],"license_note":null,"sort":3},
- {"code":"MOLD","name":"결로·곰팡이","plain_examples":["벽에 곰팡이가 펴요","겨울마다 벽이 젖어요"],"defect_hint":"단열 부족에 따른 결로, 환기 부족","db_categories":["인테리어·도배·욕실","도장·방수·코킹","창호·유리·금속"],"program_tags":["단열","도배장판","실내환경","창호"],"license_note":null,"sort":4},
- {"code":"WINDOW","name":"창호 교체·단열","plain_examples":["창문에서 바람이 들어와요","샷시가 너무 낡았어요","난방비가 많이 나와요"],"defect_hint":"노후 창호 기밀·단열 불량","db_categories":["창호·유리·금속","인테리어·도배·욕실"],"program_tags":["창호","단열"],"license_note":"1,500만원 이상이면 금속·창호·지붕·건축물조립공사업 면허 필요","sort":5},
- {"code":"BOILER","name":"보일러·난방","plain_examples":["보일러가 고장났어요","방이 안 따뜻해요","연탄보일러 바꾸고 싶어요"],"defect_hint":"보일러 노후·고장, 난방배관 문제","db_categories":["설비·누수·보일러"],"program_tags":["보일러난방","가스"],"license_note":"가스보일러는 가스시설시공업 등록 업체만 설치 가능","sort":6},
- {"code":"PIPE_LEAK","name":"배관 누수·수도","plain_examples":["아랫집에 물이 샌대요","수도요금이 갑자기 많이 나와요","바닥이 축축해요"],"defect_hint":"급수·난방 배관 누수","db_categories":["설비·누수·보일러"],"program_tags":["급수관","집수리일반"],"license_note":"1,500만원 이상이면 기계가스설비공사업 면허 필요","sort":7},
- {"code":"BATH_KITCHEN","name":"욕실·주방 수리","plain_examples":["화장실 타일이 깨졌어요","욕실 바닥에서 물이 새요","싱크대가 낡았어요"],"defect_hint":"욕실 방수층·타일·위생기구 노후","db_categories":["인테리어·도배·욕실","설비·누수·보일러"],"program_tags":["욕실주방","편의시설","방수"],"license_note":"1,500만원 이상이면 실내건축공사업 면허 필요","sort":8},
- {"code":"WALLPAPER_FLOOR","name":"도배·장판","plain_examples":["벽지가 들떴어요","장판이 찢어졌어요"],"defect_hint":"마감재 노후","db_categories":["인테리어·도배·욕실"],"program_tags":["도배장판","바닥재","집수리일반"],"license_note":null,"sort":9},
- {"code":"ELECTRIC","name":"전기·조명","plain_examples":["차단기가 자꾸 내려가요","콘센트가 타요","전등이 깜빡여요"],"defect_hint":"노후 배선·누전","db_categories":["전기·통신"],"program_tags":["전기","집수리일반"],"license_note":"전기공사는 금액과 관계없이 전기공사업 등록 업체만 가능","sort":10},
- {"code":"ROOF_SLATE","name":"슬레이트 지붕·철거","plain_examples":["슬레이트 지붕을 바꾸고 싶어요","빈집을 철거하고 싶어요","창고 지붕이 낡았어요"],"defect_hint":"석면 슬레이트, 노후 지붕","db_categories":["철거","종합건설","창호·유리·금속"],"program_tags":["슬레이트","석면","철거","지붕","빈집"],"license_note":"석면 해체는 석면해체·제거업 등록 업체만 가능","sort":11},
- {"code":"ACCESS","name":"안전·편의시설(손잡이·문턱)","plain_examples":["어르신이 화장실에서 미끄러져요","문턱을 없애고 싶어요","휠체어가 못 들어가요"],"defect_hint":"고령자·장애인 이동 불편","db_categories":["인테리어·도배·욕실","종합·기타 시공"],"program_tags":["편의시설","욕실주방","집수리일반"],"license_note":null,"sort":12},
- {"code":"STORE","name":"가게·영업장 환경개선","plain_examples":["가게 인테리어를 바꾸고 싶어요","식당 주방을 고치고 싶어요"],"defect_hint":"영업장 시설 노후","db_categories":["인테리어·도배·욕실","종합·기타 시공","도장·방수·코킹"],"program_tags":["상가인테리어"],"license_note":"1,500만원 이상이면 실내건축공사업 면허 필요","sort":13},
- {"code":"OTHER","name":"기타·잘 모르겠어요","plain_examples":["어디에 맡겨야 할지 모르겠어요"],"defect_hint":"추가 질문 필요","db_categories":["종합·기타 시공","종합건설"],"program_tags":["집수리일반"],"license_note":null,"sort":99}
+ {
+  "code": "LEAK_ROOF",
+  "name": "옥상·지붕 누수 방수",
+  "plain_examples": [
+   "천장에서 물이 새요",
+   "옥상 바닥이 갈라졌어요",
+   "비 오면 천장에 얼룩"
+  ],
+  "defect_hint": "옥상 방수층 노후·균열, 배수구 막힘",
+  "db_categories": [
+   "도장·방수·코킹",
+   "종합건설",
+   "종합·기타 시공"
+  ],
+  "program_tags": [
+   "방수",
+   "집수리일반"
+  ],
+  "license_note": "1,500만원 이상이면 도장·습식·방수·석공사업 면허 필요",
+  "sort": 1
+ },
+ {
+  "code": "WALL_CRACK",
+  "name": "외벽 균열·도장",
+  "plain_examples": [
+   "벽에 금이 갔어요",
+   "외벽 페인트가 벗겨져요",
+   "벽에서 가루가 떨어져요"
+  ],
+  "defect_hint": "외벽 균열, 도막 박리, 백화",
+  "db_categories": [
+   "도장·방수·코킹",
+   "종합건설"
+  ],
+  "program_tags": [
+   "외벽도장",
+   "집수리일반"
+  ],
+  "license_note": "1,500만원 이상이면 도장·습식·방수·석공사업 면허 필요",
+  "sort": 2
+ },
+ {
+  "code": "WINDOW_LEAK",
+  "name": "창틀·실리콘 누수(코킹)",
+  "plain_examples": [
+   "창문 틈으로 물이 들어와요",
+   "창틀 실리콘이 까맣게 됐어요"
+  ],
+  "defect_hint": "창호 주변 실링재 노후",
+  "db_categories": [
+   "도장·방수·코킹",
+   "창호·유리·금속"
+  ],
+  "program_tags": [
+   "방수",
+   "창호"
+  ],
+  "license_note": null,
+  "sort": 3
+ },
+ {
+  "code": "MOLD",
+  "name": "결로·곰팡이",
+  "plain_examples": [
+   "벽에 곰팡이가 펴요",
+   "겨울마다 벽이 젖어요"
+  ],
+  "defect_hint": "단열 부족에 따른 결로, 환기 부족",
+  "db_categories": [
+   "인테리어·도배·욕실",
+   "도장·방수·코킹",
+   "창호·유리·금속"
+  ],
+  "program_tags": [
+   "단열",
+   "도배장판",
+   "실내환경",
+   "창호"
+  ],
+  "license_note": null,
+  "sort": 4
+ },
+ {
+  "code": "WINDOW",
+  "name": "창호 교체·단열",
+  "plain_examples": [
+   "창문에서 바람이 들어와요",
+   "샷시가 너무 낡았어요",
+   "난방비가 많이 나와요"
+  ],
+  "defect_hint": "노후 창호 기밀·단열 불량",
+  "db_categories": [
+   "창호·유리·금속",
+   "인테리어·도배·욕실"
+  ],
+  "program_tags": [
+   "창호",
+   "단열"
+  ],
+  "license_note": "1,500만원 이상이면 금속·창호·지붕·건축물조립공사업 면허 필요",
+  "sort": 5
+ },
+ {
+  "code": "BOILER",
+  "name": "보일러·난방",
+  "plain_examples": [
+   "보일러가 고장났어요",
+   "방이 안 따뜻해요",
+   "연탄보일러 바꾸고 싶어요"
+  ],
+  "defect_hint": "보일러 노후·고장, 난방배관 문제",
+  "db_categories": [
+   "설비·누수·보일러"
+  ],
+  "program_tags": [
+   "보일러난방",
+   "가스"
+  ],
+  "license_note": "가스보일러는 가스시설시공업 등록 업체만 설치 가능",
+  "sort": 6
+ },
+ {
+  "code": "PIPE_LEAK",
+  "name": "배관 누수·수도",
+  "plain_examples": [
+   "아랫집에 물이 샌대요",
+   "수도요금이 갑자기 많이 나와요",
+   "바닥이 축축해요"
+  ],
+  "defect_hint": "급수·난방 배관 누수",
+  "db_categories": [
+   "설비·누수·보일러"
+  ],
+  "program_tags": [
+   "급수관",
+   "집수리일반"
+  ],
+  "license_note": "1,500만원 이상이면 기계가스설비공사업 면허 필요",
+  "sort": 7
+ },
+ {
+  "code": "BATH_KITCHEN",
+  "name": "욕실·주방 수리",
+  "plain_examples": [
+   "화장실 타일이 깨졌어요",
+   "욕실 바닥에서 물이 새요",
+   "싱크대가 낡았어요"
+  ],
+  "defect_hint": "욕실 방수층·타일·위생기구 노후",
+  "db_categories": [
+   "인테리어·도배·욕실",
+   "설비·누수·보일러"
+  ],
+  "program_tags": [
+   "욕실주방",
+   "편의시설",
+   "방수"
+  ],
+  "license_note": "1,500만원 이상이면 실내건축공사업 면허 필요",
+  "sort": 8
+ },
+ {
+  "code": "WALLPAPER_FLOOR",
+  "name": "도배·장판",
+  "plain_examples": [
+   "벽지가 들떴어요",
+   "장판이 찢어졌어요"
+  ],
+  "defect_hint": "마감재 노후",
+  "db_categories": [
+   "인테리어·도배·욕실"
+  ],
+  "program_tags": [
+   "도배장판",
+   "바닥재",
+   "집수리일반"
+  ],
+  "license_note": null,
+  "sort": 9
+ },
+ {
+  "code": "ELECTRIC",
+  "name": "전기·조명",
+  "plain_examples": [
+   "차단기가 자꾸 내려가요",
+   "콘센트가 타요",
+   "전등이 깜빡여요"
+  ],
+  "defect_hint": "노후 배선·누전",
+  "db_categories": [
+   "전기·통신"
+  ],
+  "program_tags": [
+   "전기",
+   "집수리일반"
+  ],
+  "license_note": "전기공사는 금액과 관계없이 전기공사업 등록 업체만 가능",
+  "sort": 10
+ },
+ {
+  "code": "ROOF_SLATE",
+  "name": "슬레이트 지붕·철거",
+  "plain_examples": [
+   "슬레이트 지붕을 바꾸고 싶어요",
+   "빈집을 철거하고 싶어요",
+   "창고 지붕이 낡았어요"
+  ],
+  "defect_hint": "석면 슬레이트, 노후 지붕",
+  "db_categories": [
+   "철거",
+   "종합건설",
+   "창호·유리·금속"
+  ],
+  "program_tags": [
+   "슬레이트",
+   "석면",
+   "철거",
+   "지붕",
+   "빈집"
+  ],
+  "license_note": "석면 해체는 석면해체·제거업 등록 업체만 가능",
+  "sort": 11
+ },
+ {
+  "code": "ACCESS",
+  "name": "안전·편의시설(손잡이·문턱)",
+  "plain_examples": [
+   "어르신이 화장실에서 미끄러져요",
+   "문턱을 없애고 싶어요",
+   "휠체어가 못 들어가요"
+  ],
+  "defect_hint": "고령자·장애인 이동 불편",
+  "db_categories": [
+   "인테리어·도배·욕실",
+   "종합·기타 시공"
+  ],
+  "program_tags": [
+   "편의시설",
+   "욕실주방",
+   "집수리일반"
+  ],
+  "license_note": null,
+  "sort": 12
+ },
+ {
+  "code": "STORE",
+  "name": "가게·영업장 환경개선",
+  "plain_examples": [
+   "가게 인테리어를 바꾸고 싶어요",
+   "식당 주방을 고치고 싶어요"
+  ],
+  "defect_hint": "영업장 시설 노후",
+  "db_categories": [
+   "인테리어·도배·욕실",
+   "종합·기타 시공",
+   "도장·방수·코킹"
+  ],
+  "program_tags": [
+   "상가인테리어"
+  ],
+  "license_note": "1,500만원 이상이면 실내건축공사업 면허 필요",
+  "sort": 13
+ },
+ {
+  "code": "OTHER",
+  "name": "기타·잘 모르겠어요",
+  "plain_examples": [
+   "어디에 맡겨야 할지 모르겠어요"
+  ],
+  "defect_hint": "추가 질문 필요",
+  "db_categories": [
+   "종합·기타 시공",
+   "종합건설"
+  ],
+  "program_tags": [
+   "집수리일반"
+  ],
+  "license_note": null,
+  "sort": 99
+ }
 ]
