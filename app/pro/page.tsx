@@ -31,7 +31,7 @@ export default function ProPage() {
   }, [profile]);
 
   if (!ready) return <main className="wrap">불러오는 중…</main>;
-  if (!profile) return <main className="wrap"><LoginBox title="시공업체 로그인" hint="동해시 시공업체 전용 화면이에요. 시연 계정으로 로그인하세요." /></main>;
+  if (!profile) return <main className="wrap"><LoginBox role="contractor" title="시공업체 로그인" hint="동해시 시공업체 전용 화면이에요. 시연 계정으로 로그인하세요." /></main>;
   if (profile.role !== "contractor") return <main className="wrap"><p>시공업체 계정이 아니에요. <button className="btn sm ghost" onClick={logout}>로그아웃</button></p></main>;
 
   async function setStatus(id: string, status: string) {

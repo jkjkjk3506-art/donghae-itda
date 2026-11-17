@@ -65,7 +65,7 @@ export default function AdminPage() {
   }, [view, cons, works, progs, biz]);
 
   if (!ready) return <main className="wrap">불러오는 중…</main>;
-  if (!profile) return <main className="wrap"><LoginBox title="주무관 로그인" hint="동해시 담당 공무원 전용 화면이에요. 시연 계정으로 로그인하세요." /></main>;
+  if (!profile) return <main className="wrap"><LoginBox role="admin" title="주무관 로그인" hint="동해시 담당 공무원 전용 화면이에요. 시연 계정으로 로그인하세요." /></main>;
   if (profile.role !== "admin") return <main className="wrap"><p>주무관 계정이 아니에요. <button className="btn sm ghost" onClick={logout}>로그아웃</button></p></main>;
 
   const flash = (m: string) => { setMsg(m); setTimeout(() => setMsg(""), 2500); };
