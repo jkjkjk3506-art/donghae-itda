@@ -87,7 +87,8 @@ export function pickLegal(all: LegalNote[], work_code: string, audience: "citize
     .sort((a, b) => Number(b.applies) - Number(a.applies) || RANK[a.level] - RANK[b.level] || a.sort - b.sort);
 }
 
-export async function runMatch(inp: MatchInput): Promise<MatchResult> {
+/** 견적 요청 전 미리보기: 공사·지원금·주의사항·받을 업체 */
+export async function planFor(inp: MatchInput) {
   const db = sbServer();
   const [w, p, b, l] = await Promise.all([
     db.from("work_types").select("*").order("sort"),
@@ -100,14 +101,7 @@ export async function runMatch(inp: MatchInput): Promise<MatchResult> {
   const works = w.data as WorkType[];
   const work = works.find((x) => x.code === inp.work_code) || works.find((x) => x.code === "OTHER")!;
   const { programs, maybe } = pickPrograms(p.data as Program[], work, inp);
-  const businesses = pickBusinesses(b.data as Business[], work);
-  const legal = pickLegal(l.data as LegalNote[], work.code, inp.audience || "citizen", inp.housing, inp.floors);
-  const consultation_id = /^[0-9a-f-]{36}$/.test(inp.consultation_id || "") ? inp.consultation_id! : crypto.randomUUID();
-  // 기록 실패가 안내를 막지 않게 함
-  await db.rpc("log_consultation", { p: {
-    id: consultation_id, channel: inp.channel || "citizen", dong: inp.dong || null, housing: inp.housing, floors: inp.floors || null,
-    conditions: inp.conditions, input_text: inp.input_text || "", has_photo: !!inp.has_photo, diagnosis: inp.diagnosis ?? null,
-    work_code: work.code, program_ids: programs.map((x) => x.id), business_ids: businesses.map((x) => x.id),
-  } }).then(() => null, () => null);
-  return { consultation_id, work, programs, maybe_programs: maybe, businesses, legal, all_works: works.map(({ code, name }) => ({ code, name })) };
+  const recipients = pickBusinesses(b.data as Business[], work);
+  const legal = pickLegal(l.data as LegalNote[], work.code, "citizen", inp.housing, inp.floors);
+  return { work, programs, maybe_programs: maybe, legal, recipients, all_works: works.map(({ code, name }) => ({ code, name })) };
 }

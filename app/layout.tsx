@@ -4,7 +4,7 @@ import TopBar from "@/components/TopBar";
 
 export const metadata: Metadata = {
   title: "동해시 AI 잇다",
-  description: "사진 한 장으로 우리 집 수리에 맞는 지원사업과 동해시 업체를 이어 드려요",
+  description: "사진 한 장 올리면 동해시 확인 업체들이 집수리 견적을 보내드려요",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

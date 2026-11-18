@@ -51,3 +51,25 @@ export const DONGS = ["천곡동","송정동","북삼동","부곡동","동호동
 export const REQ_LABEL: Record<string, string> = {
   low_income: "저소득 가구", senior: "65세 이상", disabled: "장애인 가구", rural: "농어촌 주택", youth: "청년",
 };
+
+export type Plan = {
+  work: WorkType; programs: Program[]; maybe_programs: { p: Program; why: string }[];
+  legal: LegalNote[]; recipient_count: number; all_works: { code: string; name: string }[];
+};
+export type QuoteBiz = {
+  id: number; name: string; category: string; phone: string | null; licenses: string | null; public_works?: string | null;
+  trust_level: number; source_count?: number | null; is_newcomer: boolean; is_demo: boolean; intro?: string | null; joined?: boolean;
+};
+export type Quote = {
+  id: string; created_at: string; price_min: number; price_max: number; visit: string | null; period: string | null;
+  message: string | null; status: "sent" | "chosen" | "declined"; business: QuoteBiz;
+};
+export type RequestView = {
+  request: {
+    id: string; created_at: string; work_code: string; work_name: string; housing: string; floors: string | null; dong: string | null;
+    text: string | null; photo: string | null; diagnosis: Diagnosis | null; program_ids: string[]; status: "open" | "chosen" | "closed";
+    chosen_quote: string | null; citizen_name: string | null;
+  };
+  quotes: Quote[]; recipients: QuoteBiz[];
+};
+export const won = (man: number) => (man >= 10000 ? `${(man / 10000).toFixed(man % 10000 ? 1 : 0)}억` : `${man.toLocaleString()}만`) + "원";

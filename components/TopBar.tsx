@@ -12,9 +12,9 @@ export default function TopBar() {
       <div className="in">
         <Link href="/" className="brand">동해시 AI <span>잇다</span></Link>
         <nav className="nav">
-          <Link href="/" className={p === "/" ? "on" : ""}>시민</Link>
+          <Link href="/" className={p === "/" ? "on" : ""}>견적 요청</Link>
           <Link href="/admin" className={p.startsWith("/admin") ? "on" : ""}>주무관</Link>
-          <Link href="/pro" className={p.startsWith("/pro") ? "on" : ""}>시공업체</Link>
+          <Link href="/pro" className={p.startsWith("/pro") ? "on" : ""}>업체</Link>
           <button onClick={() => setBig(!big)} aria-pressed={big}>{big ? "글자 보통" : "글자 크게"}</button>
         </nav>
       </div>

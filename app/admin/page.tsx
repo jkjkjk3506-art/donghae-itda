@@ -2,10 +2,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { sb } from "@/lib/supabase";
 import { LoginBox, useProfile } from "@/components/Auth";
-import CitizenFlow from "@/components/CitizenFlow";
+import RequestForm from "@/components/RequestForm";
 import type { Program, WorkType } from "@/lib/types";
 
-type C = { id: string; created_at: string; channel: string; dong: string | null; housing: string | null; work_code: string | null; program_ids: string[]; business_ids: number[] };
+type C = { id: string; created_at: string; channel: string; dong: string | null; housing: string | null; work_code: string | null; program_ids: string[]; recipients: number[]; status: string };
+type Q = { request_id: string; business_id: number; status: string };
 type B = { id: number; name: string; category: string; trust_level: number; phone: string | null; visible: boolean; is_newcomer: boolean; is_demo: boolean; public_works_total: number };
 const AUD: Record<string, string> = { citizen: "시민", store: "가게", facility: "시설", business: "업체", info: "안내" };
 const CH: Record<string, string> = { citizen: "시민", counter: "창구", demo: "예시" };
@@ -25,7 +26,7 @@ export default function AdminPage() {
   const { profile, ready, logout } = useProfile();
   const [tab, setTab] = useState("counter");
   const [cons, setCons] = useState<C[]>([]);
-  const [inq, setInq] = useState<{ status: string }[]>([]);
+  const [qs, setQs] = useState<Q[]>([]);
   const [works, setWorks] = useState<WorkType[]>([]);
   const [progs, setProgs] = useState<Program[]>([]);
   const [biz, setBiz] = useState<B[]>([]);
@@ -37,13 +38,13 @@ export default function AdminPage() {
   async function load() {
     const db = sb();
     const [c, i, w, p, b] = await Promise.all([
-      db.from("consultations").select("id,created_at,channel,dong,housing,work_code,program_ids,business_ids").order("created_at", { ascending: false }).limit(2000),
-      db.from("inquiries").select("status"),
+      db.from("requests").select("id,created_at,channel,dong,housing,work_code,program_ids,recipients,status").order("created_at", { ascending: false }).limit(3000),
+      db.from("quotes").select("request_id,business_id,status"),
       db.from("work_types").select("*").order("sort"),
       db.from("programs").select("*").order("id"),
       db.from("businesses").select("id,name,category,trust_level,phone,visible,is_newcomer,is_demo,public_works_total").order("id").range(0, 2999),
     ]);
-    setCons((c.data || []) as C[]); setInq(i.data || []); setWorks((w.data || []) as WorkType[]); setProgs((p.data || []) as Program[]); setBiz((b.data || []) as B[]);
+    setCons((c.data || []) as C[]); setQs((i.data || []) as Q[]); setWorks((w.data || []) as WorkType[]); setProgs((p.data || []) as Program[]); setBiz((b.data || []) as B[]);
   }
   useEffect(() => { if (profile?.role === "admin") load(); }, [profile]);
 
@@ -52,17 +53,24 @@ export default function AdminPage() {
   const stats = useMemo(() => {
     const pname = (id: string) => progs.find((p) => p.id === id)?.name || id;
     const bmap = new Map(biz.map((b) => [b.id, b]));
-    const shown = view.flatMap((c) => c.business_ids || []).map((id) => bmap.get(id)).filter((b): b is B => !!b && !b.is_demo);
-    const per = new Map<number, number>(); shown.forEach((b) => per.set(b.id, (per.get(b.id) || 0) + 1));
-    const topShare = shown.length ? Math.round((Math.max(0, ...per.values()) / shown.length) * 100) : 0;
+    const real = view.filter((c) => c.channel !== "demo");
+    const ids = new Set(real.map((c) => c.id));
+    const rq = qs.filter((q) => ids.has(q.request_id));
+    const answered = new Set(rq.map((q) => q.request_id)).size;
+    const per = new Map<number, number>(); view.flatMap((c) => c.recipients || []).forEach((id) => { if (!bmap.get(id)?.is_demo) per.set(id, (per.get(id) || 0) + 1); });
+    const sentTotal = [...per.values()].reduce((a, b) => a + b, 0);
+    const newTotal = [...per.entries()].filter(([id]) => bmap.get(id)?.is_newcomer).reduce((a, [, n]) => a + n, 0);
     return {
       byWork: count(view, (c) => works.find((w) => w.code === c.work_code)?.name || c.work_code).slice(0, 10),
       byDong: count(view, (c) => c.dong).slice(0, 10),
       byProg: count(view.flatMap((c) => c.program_ids || []), (x) => pname(x)).slice(0, 8),
-      newShare: shown.length ? Math.round((shown.filter((b) => b.is_newcomer).length / shown.length) * 100) : 0,
-      distinct: per.size, topShare, counter: view.filter((c) => c.channel === "counter").length, demo: cons.filter((c) => c.channel === "demo").length,
+      chosen: view.filter((c) => c.status === "chosen").length,
+      answered, quotes: rq.length, joined: new Set(qs.map((q) => q.business_id)).size,
+      newShare: sentTotal ? Math.round((newTotal / sentTotal) * 100) : 0,
+      topShare: sentTotal ? Math.round((Math.max(0, ...per.values()) / sentTotal) * 100) : 0,
+      distinct: per.size, counter: view.filter((c) => c.channel === "counter").length, demo: cons.filter((c) => c.channel === "demo").length, real: real.length,
     };
-  }, [view, cons, works, progs, biz]);
+  }, [view, cons, works, progs, biz, qs]);
 
   if (!ready) return <main className="wrap">불러오는 중…</main>;
   if (!profile) return <main className="wrap"><LoginBox role="admin" title="주무관 로그인" hint="동해시 담당 공무원 전용 화면이에요. 시연 계정으로 로그인하세요." /></main>;
@@ -86,13 +94,12 @@ export default function AdminPage() {
     setBiz(biz.map((x) => (x.id === b.id ? { ...x, visible: !b.visible } : x)));
   }
   function csv() {
-    const rows = [["일시", "경로", "동", "건물", "공사", "안내 지원사업 수", "소개 업체 수"], ...view.map((c) => [new Date(c.created_at).toLocaleString("ko-KR"), CH[c.channel] || c.channel, c.dong || "", c.housing || "", wname(c.work_code), c.program_ids.length, c.business_ids.length])];
+    const rows = [["일시", "경로", "동", "건물", "공사", "안내 지원사업 수", "요청 받은 업체 수", "받은 견적 수", "상태"], ...view.map((c) => [new Date(c.created_at).toLocaleString("ko-KR"), CH[c.channel] || c.channel, c.dong || "", c.housing || "", wname(c.work_code), c.program_ids.length, c.recipients.length, qs.filter((q) => q.request_id === c.id).length, c.status === "chosen" ? "업체 선택" : "진행 중"])];
     const blob = new Blob(["﻿" + rows.map((r) => r.map((x) => `"${String(x).replace(/"/g, '""')}"`).join(",")).join("\n")], { type: "text/csv" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "잇다_상담현황.csv"; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "잇다_견적요청현황.csv"; a.click();
   }
   const filtered = biz.filter((b) => !q || b.name.includes(q) || b.category.includes(q)).slice(0, 80);
-  const st = (s: string) => inq.filter((x) => x.status === s).length;
-
+  
   return (
     <main className="wrap">
       <div className="pagehead row between">
@@ -100,43 +107,43 @@ export default function AdminPage() {
         <button className="btn sm ghost" onClick={logout}>로그아웃</button>
       </div>
       <div className="tabs">
-        {[["counter", "창구 모드"], ["dash", "현황판"], ["programs", "지원사업 관리"], ["biz", "업체 관리"]].map(([k, l]) =>
+        {[["counter", "창구 접수"], ["dash", "현황판"], ["programs", "지원사업 관리"], ["biz", "업체 관리"]].map(([k, l]) =>
           <button key={k} className={tab === k ? "on" : ""} onClick={() => { setTab(k); if (k === "dash") load(); }}>{l}</button>)}
       </div>
       {msg && <div className="notice" role="status" style={{ marginBottom: 12 }}>{msg}</div>}
 
       {tab === "counter" && <>
-        <div className="notice" style={{ marginBottom: 14 }}>행정복지센터 창구에서 어르신 대신 입력하고, 맨 아래 요약을 문자로 보내거나 인쇄해 드리세요. 창구 상담은 현황판에 따로 집계돼요.</div>
-        <CitizenFlow channel="counter" />
+        <div className="notice" style={{ marginBottom: 14 }}>스마트폰이 어려운 어르신이 오시면 대신 견적 요청을 넣어 드리세요. 접수 후 견적 확인 링크를 문자로 보내 드리면, 가족과 함께 견적을 비교하고 고를 수 있어요.</div>
+        <RequestForm channel="counter" />
       </>}
 
       {tab === "dash" && <>
         <div className="row between" style={{ marginBottom: 12 }}>
-          <label className="check small" style={{ margin: 0 }}><input type="checkbox" checked={withDemo} onChange={(e) => setWithDemo(e.target.checked)} /><span>시연용 예시 상담 {stats.demo}건 포함 (실제 상담 아님)</span></label>
+          <label className="check small" style={{ margin: 0 }}><input type="checkbox" checked={withDemo} onChange={(e) => setWithDemo(e.target.checked)} /><span>시연용 예시 요청 {stats.demo}건 포함 (실제 요청 아님)</span></label>
           <button className="btn sm ghost" onClick={csv}>엑셀(CSV)로 내려받기</button>
         </div>
         <div className="grid g3">
-          <div className="card"><div className="muted small">상담</div><div className="kpi">{view.length}</div><div className="small muted">그중 창구 {stats.counter}건</div></div>
-          <div className="card"><div className="muted small">업체 견적 문의</div><div className="kpi">{inq.length}</div><div className="small muted">새 문의 {st("new")} · 연락함 {st("contacted")} · 완료 {st("done")}</div></div>
-          <div className="card"><div className="muted small">소개된 업체</div><div className="kpi">{stats.distinct}곳</div><div className="small muted">신규 업체 비율 {stats.newShare}% · 한 업체 최대 {stats.topShare}%</div></div>
+          <div className="card"><div className="muted small">견적 요청</div><div className="kpi">{view.length}건</div><div className="small muted">창구 접수 {stats.counter}건 · 업체 선택 완료 {stats.chosen}건</div></div>
+          <div className="card"><div className="muted small">견적을 받은 요청 <small>(실제 요청 기준)</small></div><div className="kpi">{stats.answered}/{stats.real}</div><div className="small muted">도착한 견적 {stats.quotes}개 · 견적 보낸 업체 {stats.joined}곳</div></div>
+          <div className="card"><div className="muted small">요청이 간 업체</div><div className="kpi">{stats.distinct}곳</div><div className="small muted">신규 업체 비율 {stats.newShare}% · 한 업체 최대 {stats.topShare}%</div></div>
         </div>
         <div className="grid g2" style={{ marginTop: 14 }}>
-          <div className="card"><h3>공사 수요 (공정별)</h3><Bars rows={stats.byWork} /></div>
-          <div className="card"><h3>동별 상담</h3><Bars rows={stats.byDong} /></div>
-          <div className="card"><h3>많이 안내된 지원사업</h3><Bars rows={stats.byProg} /></div>
+          <div className="card"><h3>어떤 공사 요청이 많나 (공정별)</h3><Bars rows={stats.byWork} /></div>
+          <div className="card"><h3>어느 동에서 많나</h3><Bars rows={stats.byDong} /></div>
+          <div className="card"><h3>요청과 함께 안내된 지원사업</h3><Bars rows={stats.byProg} /></div>
           <div className="card"><h3>이 숫자를 이렇게 써요</h3>
             <ul className="small" style={{ margin: 0, paddingLeft: 18 }}>
-              <li>공정별 수요: 내년 집수리 지원사업 물량·예산 배분 근거</li>
-              <li>동별 상담: 찾아가는 상담, 홍보가 필요한 동 선정</li>
-              <li>한 업체 최대 비율: 특정 업체에 소개가 쏠리지 않는지 확인</li>
-              <li>신규 업체 비율: 새 업체에게도 기회가 돌아가는지 확인</li>
+              <li>공정별 요청: 내년 집수리 지원사업 물량·예산 배분 근거</li>
+              <li>견적을 못 받은 요청: 업체가 부족한 공사·지역 파악</li>
+              <li>한 업체 최대 비율: 특정 업체에 요청이 쏠리지 않는지 확인</li>
+              <li>신규 업체 비율: 새 업체에게도 기회가 가는지 확인</li>
             </ul></div>
         </div>
         <div className="card scroll" style={{ marginTop: 14 }}>
-          <h3>최근 상담</h3>
-          <table><thead><tr><th>일시</th><th>경로</th><th>동</th><th>건물</th><th>공사</th><th>지원사업</th><th>업체</th></tr></thead>
+          <h3>최근 견적 요청</h3>
+          <table><thead><tr><th>일시</th><th>경로</th><th>동</th><th>건물</th><th>공사</th><th>받은 견적</th><th>상태</th></tr></thead>
             <tbody>{view.slice(0, 12).map((c) => <tr key={c.id}><td className="small">{new Date(c.created_at).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
-              <td>{CH[c.channel] || c.channel}</td><td>{c.dong || "-"}</td><td>{c.housing}</td><td>{wname(c.work_code)}</td><td>{c.program_ids.length}개</td><td>{c.business_ids.length}곳</td></tr>)}</tbody></table>
+              <td>{CH[c.channel] || c.channel}</td><td>{c.dong || "-"}</td><td>{c.housing}</td><td>{wname(c.work_code)}</td><td>{qs.filter((q) => q.request_id === c.id).length}개</td><td>{c.status === "chosen" ? "업체 선택" : "진행 중"}</td></tr>)}</tbody></table>
         </div>
       </>}
 
