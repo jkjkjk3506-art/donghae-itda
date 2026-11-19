@@ -12,6 +12,9 @@ export type Program = {
   requires: string[]; amount_text: string | null; schedule_2026: string | null; expected_next: string | null;
   apply_where: string | null; contact: string | null; contractor_opportunity: string | null;
   official_source_url: string[]; eligibility: Record<string, string> | null; active?: boolean;
+  level?: string | null; keywords?: string[]; verified_note?: string | null; verified_date?: string | null; updated_at?: string;
+  notice_title?: string | null; notice_no?: string | null; apply_start?: string | null; apply_end?: string | null;
+  notice_files?: { name: string; path: string; url: string }[]; updated_by?: string | null;
 };
 export type Business = {
   id: number; name: string; category: string; sub_category: string | null; trust_level: number;
@@ -73,3 +76,23 @@ export type RequestView = {
   quotes: Quote[]; recipients: QuoteBiz[];
 };
 export const won = (man: number) => (man >= 10000 ? `${(man / 10000).toFixed(man % 10000 ? 1 : 0)}억` : `${man.toLocaleString()}만`) + "원";
+
+/** 신청 상태: 날짜가 있으면 날짜로, 없으면 일정 문구로 판단 */
+export function applyStatus(p: Program): { label: string; tone: "open" | "soon" | "closed" | "always" | "unknown"; dday?: number } {
+  const today = new Date(new Date().toDateString()).getTime();
+  const d = (x?: string | null) => (x ? new Date(x + "T00:00:00").getTime() : null);
+  const s = d(p.apply_start), e = d(p.apply_end);
+  if (s || e) {
+    if (s && today < s) return { label: `신청 예정 (${p.apply_start} 시작)`, tone: "soon" };
+    if (e && today > e) return { label: "신청 마감", tone: "closed" };
+    const dday = e ? Math.round((e - today) / 86400000) : undefined;
+    return { label: dday !== undefined ? `신청 중 · 마감 D-${dday}` : "신청 중", tone: "open", dday };
+  }
+  if (/연중|상시|수시|소진 시/.test(p.schedule_2026 || "")) return { label: "연중 신청", tone: "always" };
+  return { label: "일정 확인 필요", tone: "unknown" };
+}
+export const ELIG_LABEL: Record<string, string> = {
+  income: "소득 기준", building: "건물 조건", location: "지역", owner_or_tenant: "거주 형태", extra: "추가 지원", age: "나이",
+  household: "가구 조건", target: "대상", business: "사업자 조건", facility: "시설 조건", period: "기간", exclude: "제외 대상", condition: "조건", note: "참고",
+};
+export const AUD_LABEL: Record<string, string> = { citizen: "시민(주택)", store: "가게·영업장", facility: "복지·보육 시설", business: "시공업체", info: "정보 안내" };

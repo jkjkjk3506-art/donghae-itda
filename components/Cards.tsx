@@ -1,5 +1,6 @@
 "use client";
 import type { Business, LegalNote, Program } from "@/lib/types";
+import { applyStatus } from "@/lib/types";
 
 const ICON = { danger: "금지·의무", warn: "주의", info: "알아두기" };
 
@@ -27,13 +28,14 @@ export function LegalList({ notes }: { notes: LegalNote[] }) {
 }
 
 export function ProgramCard({ p, why }: { p: Program; why?: string }) {
-  const open = /연중|상시|소진 시/.test(p.schedule_2026 || "");
+  const st = applyStatus(p);
+  const open = st.tone === "open" || st.tone === "always";
   return (
     <div className="card prog">
       <div className="row" style={{ gap: 6, marginBottom: 8 }}>
         {p.support_type.map((s) => <span key={s} className="tag">{s}</span>)}
         {(p.donghae_status === "시행확인" || p.donghae_status === "지구한정") && <span className="tag new">동해시 사업</span>}
-        {open && <span className="tag new">지금 신청 가능</span>}
+        <span className={`tag ${open ? "new" : st.tone === "closed" ? "" : "warn"}`}>{st.label}</span>
         {why && <span className="tag warn">{why}</span>}
       </div>
       <h3>{p.name}</h3>
@@ -44,7 +46,10 @@ export function ProgramCard({ p, why }: { p: Program; why?: string }) {
         <dt>신청</dt><dd>{p.apply_where || "-"}</dd>
         {p.contact && <><dt>문의</dt><dd><b>{p.contact}</b></dd></>}
       </dl>
-      {p.official_source_url?.[0] && <a className="small" href={p.official_source_url[0]} target="_blank" rel="noreferrer" style={{ display: "inline-block", marginTop: 8 }}>공고 원문 보기 →</a>}
+      <div className="row" style={{ gap: 12, marginTop: 8 }}>
+        {p.official_source_url?.[0] && <a className="small" href={p.official_source_url[0]} target="_blank" rel="noreferrer">공고 원문 보기 →</a>}
+        {(p.notice_files || []).map((f) => <a key={f.path} className="small" href={f.url} target="_blank" rel="noreferrer">📄 {f.name}</a>)}
+      </div>
     </div>
   );
 }

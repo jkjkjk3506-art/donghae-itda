@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { sb } from "@/lib/supabase";
 import { LoginBox, useProfile } from "@/components/Auth";
 import RequestForm from "@/components/RequestForm";
+import ProgramAdmin from "@/components/ProgramAdmin";
 import type { Program, WorkType } from "@/lib/types";
 
 type C = { id: string; created_at: string; channel: string; dong: string | null; housing: string | null; work_code: string | null; program_ids: string[]; recipients: number[]; status: string };
@@ -147,18 +148,7 @@ export default function AdminPage() {
         </div>
       </>}
 
-      {tab === "programs" && (
-        <div className="card scroll">
-          <p className="small muted" style={{ marginTop: 0 }}>'안내 중'을 끄면 시민 화면에서 바로 빠져요. 공고가 바뀌면 일정을 고쳐 주세요. 전체 {progs.length}개 · 안내 중 {progs.filter((p) => p.active).length}개</p>
-          <table><thead><tr><th>사업</th><th>대상</th><th>2026 일정</th><th>상태</th></tr></thead>
-            <tbody>{progs.map((p) => (
-              <tr key={p.id}><td><b>{p.name}</b><div className="small muted">{p.id} · {p.contact || p.apply_where}</div></td><td className="small">{AUD[p.audience] || p.audience}</td>
-                <td className="small" style={{ minWidth: 240 }}>{edit?.id === p.id
-                  ? <><textarea rows={2} value={edit.v} onChange={(e) => setEdit({ id: p.id, v: e.target.value })} /><div className="row" style={{ marginTop: 6 }}><button className="btn sm sea" onClick={saveSchedule}>저장</button><button className="btn sm ghost" onClick={() => setEdit(null)}>취소</button></div></>
-                  : <>{p.schedule_2026 || "-"} <button className="btn sm ghost" onClick={() => setEdit({ id: p.id, v: p.schedule_2026 || "" })}>수정</button></>}</td>
-                <td><button className={`btn sm ${p.active ? "sea" : "ghost"}`} onClick={() => toggleProg(p)}>{p.active ? "안내 중" : "꺼짐"}</button></td></tr>))}</tbody></table>
-        </div>
-      )}
+      {tab === "programs" && <ProgramAdmin progs={progs} setProgs={setProgs} flash={flash} who={profile.display_name || "주무관"} />}
 
       {tab === "biz" && (
         <div className="card scroll">
