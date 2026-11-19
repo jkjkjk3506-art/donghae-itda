@@ -4,7 +4,7 @@ import { sb } from "@/lib/supabase";
 import { LoginBox, useProfile } from "@/components/Auth";
 import { LegalList, ProgramCard } from "@/components/Cards";
 import type { Business, LegalNote, Program, WorkType } from "@/lib/types";
-import { HOUSING, FLOORS, won } from "@/lib/types";
+import { HOUSING, FLOORS, GROUPS, won } from "@/lib/types";
 import type { Diagnosis } from "@/lib/types";
 
 type MyQuote = { price_min: number; price_max: number; visit: string | null; period: string | null; message: string | null; status: string };
@@ -139,9 +139,9 @@ export default function ProPage() {
         <div className="card">
           <div className="notice">고른 공사의 견적 요청이 들어와요. 정보를 많이 입력하거나 돈을 내도 요청을 더 받지 않아요. 요청은 공사에 맞는 업체에 골고루 가요.</div>
           <label className="f">받을 공사</label>
-          <div className="chips">{works.filter((w) => w.code !== "OTHER").map((w) => (
+          <div className="wgroups">{GROUPS.map((g) => <div key={g}><div className="wglabel">{g}</div><div className="chips">{works.filter((w) => w.grp === g).map((w) => (
             <button key={w.code} className={`chip ${myWorks.includes(w.code) ? "on" : ""}`}
-              onClick={() => setBiz({ ...biz, work_codes: myWorks.includes(w.code) ? myWorks.filter((x) => x !== w.code) : [...myWorks, w.code] })}>{w.name}</button>))}</div>
+              onClick={() => setBiz({ ...biz, work_codes: myWorks.includes(w.code) ? myWorks.filter((x) => x !== w.code) : [...myWorks, w.code] })}>{w.name}</button>))}</div></div>)}</div>
           <label className="f">전화번호</label><input type="tel" value={biz.phone || ""} onChange={(e) => setBiz({ ...biz, phone: e.target.value })} />
           <label className="f">업체 소개</label><textarea rows={2} value={biz.intro || ""} onChange={(e) => setBiz({ ...biz, intro: e.target.value })} />
           <div className="small muted" style={{ marginTop: 10 }}>상호·면허·신뢰도는 동해시가 공공데이터로 확인해 관리해요.</div>

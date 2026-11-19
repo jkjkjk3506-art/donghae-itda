@@ -16,6 +16,10 @@ const MATCH_KW: Record<string, string[]> = {
   WINDOW: ["창호", "샷시", "새시", "유리"], BOILER: ["보일러", "난방"], PIPE_LEAK: ["배관", "누수", "설비"],
   BATH_KITCHEN: ["욕실", "타일", "주방", "인테리어"], WALLPAPER_FLOOR: ["도배", "장판"], ELECTRIC: ["전기"],
   ROOF_SLATE: ["철거", "지붕", "석면"], ACCESS: ["인테리어", "집수리", "실내건축"], STORE: ["인테리어", "실내건축"],
+  TREE: ["조경", "식재", "벌목", "수목", "나무"], LANDSCAPE: ["조경", "식재", "정원", "잔디"], FENCE: ["담장", "대문", "펜스", "휀스", "금속", "철근", "콘크리트"],
+  PAVING: ["포장", "아스콘", "콘크리트", "토목"], CONCRETE: ["콘크리트", "철근", "옹벽", "토목"], DRAIN: ["하수", "배관", "정화조", "준설", "상하수도"],
+  AIRCON: ["에어컨", "냉난방", "공조", "환기"], TELECOM: ["통신", "CCTV", "씨씨티비", "정보통신"], FIRE: ["소방"],
+  DEMOLITION: ["철거", "해체", "비계"], EXTENSION: ["건축", "창고", "데크", "판넬", "조립"], SIGN: ["간판", "광고"],
 };
 
 function shuffle<T>(a: T[]) {
@@ -103,5 +107,5 @@ export async function planFor(inp: MatchInput) {
   const { programs, maybe } = pickPrograms(p.data as Program[], work, inp);
   const recipients = pickBusinesses(b.data as Business[], work);
   const legal = pickLegal(l.data as LegalNote[], work.code, "citizen", inp.housing, inp.floors);
-  return { work, programs, maybe_programs: maybe, legal, recipients, all_works: works.map(({ code, name }) => ({ code, name })) };
+  return { work, programs, maybe_programs: maybe, legal, recipients, all_works: works.map(({ code, name, grp }) => ({ code, name, grp })) };
 }

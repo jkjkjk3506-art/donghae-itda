@@ -206,3 +206,5 @@ th{color:var(--muted);font-weight:700;font-size:.85em;white-space:nowrap}
 .msec p{margin:0}
 .msec th{width:110px}
 @media (max-width:560px){.dx .dxhead img{width:84px;height:84px}.dxgrid{grid-template-columns:1fr}}
+.wgroups{display:grid;gap:10px;margin-top:10px}
+.wglabel{font-size:.8em;font-weight:800;color:var(--muted);margin-bottom:4px}

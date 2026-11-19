@@ -1,6 +1,6 @@
 export type WorkType = {
   code: string; name: string; plain_examples: string[]; defect_hint: string | null;
-  db_categories: string[]; program_tags: string[]; license_note: string | null; sort: number;
+  db_categories: string[]; program_tags: string[]; license_note: string | null; sort: number; grp?: string | null;
 };
 export type Diagnosis = {
   work_code: string; work_name?: string; defect: string; plain_explain: string;
@@ -62,7 +62,7 @@ export const REQ_LABEL: Record<string, string> = {
 
 export type Plan = {
   work: WorkType; programs: Program[]; maybe_programs: { p: Program; why: string }[];
-  legal: LegalNote[]; recipient_count: number; all_works: { code: string; name: string }[];
+  legal: LegalNote[]; recipient_count: number; all_works: { code: string; name: string; grp?: string | null }[];
 };
 export type QuoteBiz = {
   id: number; name: string; category: string; phone: string | null; licenses: string | null; public_works?: string | null;
@@ -101,3 +101,5 @@ export const ELIG_LABEL: Record<string, string> = {
   household: "가구 조건", target: "대상", business: "사업자 조건", facility: "시설 조건", period: "기간", exclude: "제외 대상", condition: "조건", note: "참고",
 };
 export const AUD_LABEL: Record<string, string> = { citizen: "시민(주택)", store: "가게·영업장", facility: "복지·보육 시설", business: "시공업체", info: "정보 안내" };
+
+export const GROUPS = ["지붕·외벽", "집 안", "설비·전기", "마당·외부", "철거·증축", "가게"];

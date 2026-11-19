@@ -2,12 +2,12 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Diagnosis, Plan } from "@/lib/types";
-import { CONDITIONS, DONGS, FLOORS, HOUSING, applyStatus } from "@/lib/types";
+import { CONDITIONS, DONGS, FLOORS, GROUPS, HOUSING, applyStatus } from "@/lib/types";
 import DiagnosisCard from "./DiagnosisCard";
 import ProgramDetail from "./ProgramDetail";
 import type { Program } from "@/lib/types";
 
-const EXAMPLES = ["비 오면 천장에서 물이 새요", "외벽에 금이 가고 페인트가 벗겨져요", "겨울마다 벽에 곰팡이가 펴요", "보일러가 고장났어요", "화장실 타일이 깨졌어요"];
+const EXAMPLES = ["비 오면 천장에서 물이 새요", "외벽에 금이 가고 페인트가 벗겨져요", "겨울마다 벽에 곰팡이가 펴요", "보일러가 고장났어요", "집 앞 나무를 베고 싶어요", "하수구가 막혔어요", "빈집을 철거하고 싶어요"];
 
 async function shrink(file: File): Promise<string> {
   const url = URL.createObjectURL(file);
@@ -164,8 +164,11 @@ export default function RequestForm({ channel = "citizen" }: { channel?: "citize
             {plan.work.license_note && <div className="small" style={{ marginTop: 6 }}><span className="tag warn">면허</span> {plan.work.license_note}</div>}
             <details open={diag.confidence < 0.5 || plan.work.code === "OTHER"} style={{ marginTop: 10 }}>
               <summary className="small" style={{ cursor: "pointer", fontWeight: 700 }}>공사 종류가 다르면 고르기</summary>
-              <div className="chips" style={{ marginTop: 8 }}>{plan.all_works.filter((w) => w.code !== "OTHER").map((w) =>
-                <button key={w.code} className={`chip ${w.code === plan.work.code ? "on" : ""}`} disabled={!!busy} onClick={() => changeWork(w.code)}>{w.name}</button>)}</div>
+              <div className="wgroups">{GROUPS.map((g) => (
+                <div key={g}><div className="wglabel">{g}</div>
+                  <div className="chips">{plan.all_works.filter((w) => w.grp === g).map((w) =>
+                    <button key={w.code} className={`chip ${w.code === plan.work.code ? "on" : ""}`} disabled={!!busy} onClick={() => changeWork(w.code)}>{w.name}</button>)}</div>
+                </div>))}</div>
             </details>
             {diag.urgent && <div className="alert" style={{ marginTop: 12 }}>위험할 수 있어요. 가스 냄새면 119·한국가스안전공사(1544-4500), 누전이면 한국전기안전공사(1588-7500)에 먼저 연락하세요.</div>}
           </div>

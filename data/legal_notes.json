@@ -59,7 +59,12 @@
    "WINDOW_LEAK",
    "WINDOW",
    "ROOF_SLATE",
-   "STORE"
+   "STORE",
+   "TREE",
+   "AIRCON",
+   "SIGN",
+   "DEMOLITION",
+   "EXTENSION"
   ],
   "audience": "both",
   "level": "danger",
@@ -108,7 +113,10 @@
    "ACCESS",
    "OTHER",
    "LEAK_ROOF",
-   "WALL_CRACK"
+   "WALL_CRACK",
+   "AIRCON",
+   "EXTENSION",
+   "TELECOM"
   ],
   "audience": "both",
   "level": "warn",
@@ -121,7 +129,8 @@
  {
   "code": "L-ASBESTOS",
   "work_codes": [
-   "ROOF_SLATE"
+   "ROOF_SLATE",
+   "DEMOLITION"
   ],
   "audience": "both",
   "level": "danger",
@@ -134,7 +143,8 @@
  {
   "code": "L-ELECTRIC",
   "work_codes": [
-   "ELECTRIC"
+   "ELECTRIC",
+   "AIRCON"
   ],
   "audience": "both",
   "level": "warn",
@@ -214,7 +224,12 @@
    "WALLPAPER_FLOOR",
    "MOLD",
    "STORE",
-   "ROOF_SLATE"
+   "ROOF_SLATE",
+   "TREE",
+   "AIRCON",
+   "TELECOM",
+   "SIGN",
+   "FIRE"
   ],
   "audience": "both",
   "level": "warn",
@@ -223,5 +238,128 @@
   "body": "이동식 사다리는 작업발판 설치가 어려운 가벼운 작업에만 쓰고, A자형 사다리로 3.5m 이하에서만 작업해요. 1.2m 이상은 2인 1조, 2m 이상은 안전대 착용, 맨 위 발판과 그 아래 디딤대에서는 작업 금지예요. 그보다 높으면 비계나 고소작업대를 써야 해요.",
   "law": "고용노동부 이동식 사다리 안전작업지침, 산업안전보건기준에 관한 규칙 제24조·제42조",
   "sort": 9
+ },
+ {
+  "code": "L-TREE",
+  "work_codes": [
+   "TREE"
+  ],
+  "audience": "both",
+  "level": "warn",
+  "condition": null,
+  "title": "나무는 어디에 있느냐에 따라 베어도 되는지가 달라요",
+  "body": "내 대지(마당)의 나무는 보통 허가 없이 벨 수 있어요. 집 앞 가로수나 도로·공터 같은 공공 땅의 나무는 개인이 베면 안 되고 시청에 민원을 넣어야 해요. 지목이 임야(산)인 땅은 내 땅이어도 벌채 허가·신고가 필요할 수 있고, 보호수는 벨 수 없어요. 나무가 전깃줄에 닿아 있으면 직접 하지 말고 한전(국번 없이 123)에 먼저 연락하세요.",
+  "law": "산림자원의 조성 및 관리에 관한 법률 제36조(입목벌채등의 허가 및 신고), 도로법(가로수)",
+  "sort": 30
+ },
+ {
+  "code": "L-WALL-2M",
+  "work_codes": [
+   "FENCE",
+   "CONCRETE"
+  ],
+  "audience": "both",
+  "level": "warn",
+  "condition": "높이 2m를 넘는 담장·옹벽",
+  "title": "2m 넘는 담장·옹벽은 공작물 축조신고가 필요해요",
+  "body": "건물과 떨어져 세우는 높이 2m 초과 담장, 대지를 만들기 위한 높이 2m 초과 옹벽은 공사 전에 시청에 공작물 축조신고를 해야 해요. 이웃과의 경계에 세우는 담은 경계선(지적) 확인을 먼저 하세요.",
+  "law": "건축법 제83조, 같은 법 시행령 제118조, 민법 제237조·제238조",
+  "sort": 31
+ },
+ {
+  "code": "L-DEMOLISH",
+  "work_codes": [
+   "DEMOLITION"
+  ],
+  "audience": "both",
+  "level": "danger",
+  "condition": null,
+  "title": "건물을 부수려면 해체 신고·허가가 먼저예요",
+  "body": "건물 전체를 해체할 때 연면적 500㎡ 미만·높이 12m 미만·3개 층 이하를 모두 충족하면 신고, 그렇지 않으면 허가 대상이에요. 주택은 해체 예정일 7일 전까지 시청에 신고서를 내야 하고, 해체 전에 석면 조사와 전기·가스 인입선 해지, 건설폐기물 처리도 챙겨야 해요.",
+  "law": "건축물관리법 제30조, 같은 법 시행령 제21조, 산업안전보건법 제119조(석면조사)",
+  "sort": 32
+ },
+ {
+  "code": "L-EXTEND",
+  "work_codes": [
+   "EXTENSION"
+  ],
+  "audience": "both",
+  "level": "danger",
+  "condition": null,
+  "title": "면적이 늘면 건축신고부터, 몰래 지으면 위반건축물이 돼요",
+  "body": "창고·방 증축, 옥상 비가림 지붕처럼 바닥면적이나 높이가 늘어나는 공사는 건축신고나 허가 대상이에요. 바닥면적 합계 85㎡ 이내 증축은 보통 신고로 할 수 있어요. 신고 없이 지으면 시정명령과 이행강제금을 받을 수 있고, 집수리 지원사업에서도 빠질 수 있어요.",
+  "law": "건축법 제11조·제14조(건축신고)·제80조(이행강제금), 같은 법 제20조(가설건축물)",
+  "sort": 33
+ },
+ {
+  "code": "L-TELECOM",
+  "work_codes": [
+   "TELECOM"
+  ],
+  "audience": "both",
+  "level": "info",
+  "condition": null,
+  "title": "통신 배선은 정보통신공사업 등록 업체에 맡기세요",
+  "body": "인터넷·CCTV·방송 같은 정보통신설비 공사는 원칙적으로 정보통신공사업 등록 업체가 해야 해요. 단순 기기 교체 같은 경미한 공사는 예외가 있을 수 있으니 견적 때 등록 여부를 확인하세요. CCTV는 이웃집·도로를 비추면 개인정보 문제가 생길 수 있어요.",
+  "law": "정보통신공사업법 제3조, 개인정보 보호법 제25조(영상정보처리기기)",
+  "sort": 34
+ },
+ {
+  "code": "L-FIRE",
+  "work_codes": [
+   "FIRE"
+  ],
+  "audience": "both",
+  "level": "warn",
+  "condition": null,
+  "title": "소방시설 공사는 소방시설업 등록 업체만 할 수 있어요",
+  "body": "스프링클러·자동화재탐지설비 같은 소방시설을 새로 설치하거나 늘리는 공사는 소방시설공사업 등록 업체가 해야 해요. 단독주택·빌라는 소화기와 단독경보형 감지기를 갖춰야 하는데, 이 둘은 직접 사서 달아도 돼요. 동해소방서나 행정복지센터에서 취약가구에 무료로 달아주기도 해요.",
+  "law": "소방시설공사업법 제4조, 소방시설 설치 및 관리에 관한 법률 제10조(주택용 소방시설)",
+  "sort": 35
+ },
+ {
+  "code": "L-SEPTIC",
+  "work_codes": [
+   "DRAIN"
+  ],
+  "audience": "both",
+  "level": "info",
+  "condition": null,
+  "title": "정화조 청소는 등록된 업체만, 하수관은 내 땅 안까지만",
+  "body": "정화조(개인하수처리시설)는 정기적으로 청소해야 하고, 청소는 시에 허가받은 업체만 할 수 있어요. 대지 밖 공공 하수관이 막혔거나 역류하면 시청 하수도 담당 부서에 신고하세요.",
+  "law": "하수도법 제39조(개인하수처리시설 관리)·제45조(청소업 허가)",
+  "sort": 36
+ },
+ {
+  "code": "L-ROAD",
+  "work_codes": [
+   "PAVING",
+   "FENCE",
+   "CONCRETE",
+   "DEMOLITION",
+   "EXTENSION",
+   "SIGN"
+  ],
+  "audience": "both",
+  "level": "info",
+  "condition": "집 앞 도로·인도를 쓰는 경우",
+  "title": "도로·인도에 자재를 쌓거나 파려면 도로점용허가",
+  "body": "공사 중 도로나 인도에 자재·장비를 두거나, 집 앞 도로를 파고 포장하려면 시청에 도로점용허가를 받아야 해요. 진입로를 내려고 보도 턱을 낮추는 것도 허가 대상이에요.",
+  "law": "도로법 제61조(도로의 점용 허가)",
+  "sort": 37
+ },
+ {
+  "code": "L-SIGN",
+  "work_codes": [
+   "SIGN"
+  ],
+  "audience": "both",
+  "level": "warn",
+  "condition": null,
+  "title": "간판은 크기·위치에 따라 허가·신고 대상이에요",
+  "body": "건물 벽에 다는 가로형 간판, 돌출 간판, 옥상 간판은 크기와 위치에 따라 시청에 옥외광고물 허가나 신고를 해야 해요. 오래된 간판은 강풍에 떨어질 수 있으니 고정 상태를 점검하세요.",
+  "law": "옥외광고물 등의 관리와 옥외광고산업 진흥에 관한 법률 제3조",
+  "sort": 38
  }
 ]
