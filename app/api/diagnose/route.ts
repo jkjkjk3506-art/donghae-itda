@@ -24,3 +24,12 @@ export async function POST(req: Request) {
   }
   return NextResponse.json({ ...keywordDiagnose(text, works), source: demo || process.env.DEMO_MODE === "1" ? "demo" : "keyword" });
 }
+
+/** 점검용: /api/diagnose?token=SEED_TOKEN&text=... (Gemini 응답 확인) */
+export async function GET(req: Request) {
+  const u = new URL(req.url);
+  if (!process.env.SEED_TOKEN || u.searchParams.get("token") !== process.env.SEED_TOKEN) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const { data } = await sbServer().from("work_types").select("*").order("sort");
+  try { return NextResponse.json(await geminiDiagnose(u.searchParams.get("text") || "", null, data as WorkType[])); }
+  catch (e) { return NextResponse.json({ error: String(e).slice(0, 400) }, { status: 502 }); }
+}

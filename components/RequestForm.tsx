@@ -2,7 +2,10 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Diagnosis, Plan } from "@/lib/types";
-import { CONDITIONS, DONGS, FLOORS, HOUSING } from "@/lib/types";
+import { CONDITIONS, DONGS, FLOORS, HOUSING, applyStatus } from "@/lib/types";
+import DiagnosisCard from "./DiagnosisCard";
+import ProgramDetail from "./ProgramDetail";
+import type { Program } from "@/lib/types";
 
 const EXAMPLES = ["비 오면 천장에서 물이 새요", "외벽에 금이 가고 페인트가 벗겨져요", "겨울마다 벽에 곰팡이가 펴요", "보일러가 고장났어요", "화장실 타일이 깨졌어요"];
 
@@ -36,6 +39,7 @@ export default function RequestForm({ channel = "citizen" }: { channel?: "citize
   const [form, setForm] = useState({ name: "", phone: "", consent: false });
   const [listening, setListening] = useState(false);
   const [done, setDone] = useState<string | null>(null);
+  const [detail, setDetail] = useState<{ p: Program; why?: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const step2 = useRef<HTMLDivElement>(null);
 
@@ -154,16 +158,10 @@ export default function RequestForm({ channel = "citizen" }: { channel?: "citize
       {plan && diag && (
         <>
           <div className="card" style={{ marginTop: 14 }}>
-            <div className="stephead"><span className="n">2</span><b>AI가 정리한 견적 요청서</b><span className="small muted">업체에 이대로 전달돼요</span></div>
-            <div className="sheet">
-              {photo && <img src={photo} alt="" />}
-              <div>
-                <div className="muted small">공사 종류</div>
-                <div className="big">{plan.work.name}</div>
-                <p style={{ margin: "4px 0" }}>{plan.work.code === diag.work_code ? diag.plain_explain : `직접 고르신 '${plan.work.name}'(으)로 요청해요.`}</p>
-                <div className="small muted">{[HOUSING.find((h) => h.v === housing)?.label, FLOORS.find((f) => f.v === floors)?.label, dong].filter(Boolean).join(" · ")}{text && ` · "${text}"`}</div>
-              </div>
-            </div>
+            <div className="stephead"><span className="n">2</span><b>{photo ? "AI가 사진을 보고 진단했어요" : "AI 진단 결과"}</b><span className="small muted">이 내용이 견적 요청서로 업체에 전달돼요</span></div>
+            <DiagnosisCard d={diag} workCode={plan.work.code} workName={plan.work.name} photo={photo} />
+            <div className="small muted" style={{ marginTop: 10 }}>{[HOUSING.find((h) => h.v === housing)?.label, FLOORS.find((f) => f.v === floors)?.label, dong].filter(Boolean).join(" · ")}{text && ` · "${text}"`}</div>
+            {plan.work.license_note && <div className="small" style={{ marginTop: 6 }}><span className="tag warn">면허</span> {plan.work.license_note}</div>}
             <details open={diag.confidence < 0.5 || plan.work.code === "OTHER"} style={{ marginTop: 10 }}>
               <summary className="small" style={{ cursor: "pointer", fontWeight: 700 }}>공사 종류가 다르면 고르기</summary>
               <div className="chips" style={{ marginTop: 8 }}>{plan.all_works.filter((w) => w.code !== "OTHER").map((w) =>
@@ -172,19 +170,29 @@ export default function RequestForm({ channel = "citizen" }: { channel?: "citize
             {diag.urgent && <div className="alert" style={{ marginTop: 12 }}>위험할 수 있어요. 가스 냄새면 119·한국가스안전공사(1544-4500), 누전이면 한국전기안전공사(1588-7500)에 먼저 연락하세요.</div>}
           </div>
 
-          {plan.programs.length > 0 && (
+          {(plan.programs.length > 0 || plan.maybe_programs.length > 0) && (
             <div className="card money" style={{ marginTop: 14 }}>
-              <div className="row between"><b>💰 잠깐! 이 공사는 지원금을 받을 수도 있어요</b></div>
-              <p className="small" style={{ margin: "6px 0 10px" }}>대부분 <b>공사 시작 전에 신청</b>해야 해요. 견적을 받는 동안 먼저 문의해 보세요.</p>
-              {plan.programs.slice(0, 2).map((p) => (
-                <div key={p.id} className="moneyrow">
-                  <div><b>{p.name}</b>{p.amount_text && <div className="small muted">{p.amount_text.slice(0, 70)}{p.amount_text.length > 70 ? "…" : ""}</div>}</div>
-                  <div className="small" style={{ textAlign: "right", flex: "none" }}>{p.contact || p.apply_where}</div>
-                </div>
-              ))}
-              {plan.programs.length > 2 && <div className="small muted">외 {plan.programs.length - 2}개는 요청 후 화면에서 볼 수 있어요.</div>}
+              <b>💰 {plan.programs.length ? `이 공사, 지원금 받을 수 있는 사업이 ${plan.programs.length}개 있어요` : "조건이 맞으면 받을 수 있는 지원사업이 있어요"}</b>
+              <p className="small" style={{ margin: "6px 0 4px" }}>대부분 <b>공사 시작 전에 신청</b>해야 해요. 견적을 받는 동안 먼저 문의해 보세요.</p>
+              {[...plan.programs.map((p) => ({ p, why: undefined as string | undefined })), ...plan.maybe_programs].map(({ p, why }) => {
+                const st = applyStatus(p);
+                return (
+                  <div key={p.id} className="moneyrow">
+                    <div style={{ minWidth: 0 }}>
+                      <b>{p.name}</b>
+                      <div className="row" style={{ gap: 4, margin: "3px 0" }}>
+                        <span className={`tag ${st.tone === "open" || st.tone === "always" ? "new" : "warn"}`}>{st.label}</span>
+                        {why && <span className="tag warn">{why}</span>}
+                      </div>
+                      {p.amount_text && <div className="small muted">{p.amount_text.length > 80 ? p.amount_text.slice(0, 80) + "…" : p.amount_text}</div>}
+                    </div>
+                    <button className="btn sm sea" style={{ flex: "none", alignSelf: "center" }} onClick={() => setDetail({ p, why })}>자세히 보기</button>
+                  </div>
+                );
+              })}
             </div>
           )}
+          {detail && <ProgramDetail p={detail.p} why={detail.why} onClose={() => setDetail(null)} />}
 
           <div className="card" style={{ marginTop: 14 }}>
             <div className="stephead"><span className="n">3</span><b>동해 업체 {plan.recipient_count}곳에 견적 요청 보내기</b></div>

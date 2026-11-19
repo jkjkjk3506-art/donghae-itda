@@ -33,7 +33,13 @@ export async function geminiDiagnose(text: string, image: string | null, works: 
   const list = works.map((w) => `- ${w.code}: ${w.name} (예: ${w.plain_examples.join(", ")})`).join("\n");
   const prompt = `당신은 동해시 집수리 상담 도우미입니다. 시민이 보낸 사진과 설명으로 어떤 공사가 필요한지 판별하세요.
 반드시 아래 공정 코드 중 하나만 고르세요. 확실하지 않으면 confidence를 낮추고 questions에 확인 질문을 1~2개 넣으세요.
-업체 이름, 가격, 지원금액은 절대 말하지 마세요. plain_explain은 어르신도 이해할 수 있게 2문장 이내 쉬운 말로 쓰세요.
+업체 이름, 가격, 지원금액은 절대 말하지 마세요. 모든 글은 어르신도 이해할 수 있는 쉬운 말로 쓰세요.
+- plain_explain: 한두 문장 요약
+- problems: 사진·설명에서 실제로 보이는 문제 2~4개 (보이지 않는 것은 지어내지 말 것)
+- cause: 가장 그럴듯한 원인 한 문장 (추정이라는 걸 전제로)
+- method: 보통 하는 공사 순서 3~5단계 (예: 기존 방수층 상태 확인 → 들뜬 부분 제거 → 바탕 보수 → 방수재 도포)
+- risk: 그대로 두면 생길 수 있는 일 한 문장
+- severity: 급한 정도 low(천천히 해도 됨)/mid(올해 안에)/high(빨리)
 가스 냄새·누전·구조 붕괴 위험이 보이면 urgent를 true로 하세요.
 
 공정 코드:
@@ -58,8 +64,13 @@ ${list}
             confidence: { type: "NUMBER" },
             questions: { type: "ARRAY", items: { type: "STRING" } },
             urgent: { type: "BOOLEAN" },
+            problems: { type: "ARRAY", items: { type: "STRING" } },
+            cause: { type: "STRING" },
+            method: { type: "ARRAY", items: { type: "STRING" } },
+            risk: { type: "STRING" },
+            severity: { type: "STRING", enum: ["low", "mid", "high"] },
           },
-          required: ["work_code", "defect", "plain_explain", "confidence", "questions", "urgent"],
+          required: ["work_code", "defect", "plain_explain", "confidence", "questions", "urgent", "problems", "cause", "method", "risk", "severity"],
         },
       },
     }, 20000);

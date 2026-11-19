@@ -5,6 +5,11 @@ export type WorkType = {
 export type Diagnosis = {
   work_code: string; work_name?: string; defect: string; plain_explain: string;
   confidence: number; questions: string[]; urgent: boolean; source: "gemini" | "keyword" | "demo";
+  problems?: string[];   // 사진·설명에서 보이는 문제
+  cause?: string;        // 추정 원인
+  method?: string[];     // 필요한 공사 순서
+  risk?: string;         // 그대로 두면
+  severity?: "low" | "mid" | "high";
 };
 export type Program = {
   id: string; name: string; operator: string | null; audience: string; donghae_status: string | null;

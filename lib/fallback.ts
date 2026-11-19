@@ -17,6 +17,23 @@ const KEYWORDS: Record<string, string[]> = {
   STORE: ["가게", "식당", "매장", "상가", "영업장", "간판"],
 };
 
+/** AI가 없을 때 보여줄 공정별 기본 설명 (현장 일반론) */
+export const WORK_INFO: Record<string, { problems: string[]; method: string[]; risk: string; severity: "low" | "mid" | "high" }> = {
+  LEAK_ROOF: { problems: ["천장 누수 또는 물 얼룩", "옥상·지붕 방수층 손상 의심"], method: ["누수 위치와 옥상 방수층 상태 확인", "들뜨거나 갈라진 방수층 제거", "바탕면 균열 보수·청소", "방수재(우레탄 등) 도포", "배수구 정비"], risk: "천장 마감재가 썩고 곰팡이·누전으로 번질 수 있어요.", severity: "high" },
+  WALL_CRACK: { problems: ["외벽 균열", "페인트 벗겨짐·가루 날림"], method: ["균열 폭·깊이 확인", "들뜬 도막 제거·고압 세척", "균열 보수(실링·보수재)", "하도 → 상도 도장"], risk: "균열로 빗물이 스며들어 실내 누수·철근 부식이 생길 수 있어요.", severity: "mid" },
+  WINDOW_LEAK: { problems: ["창틀 주변 실리콘 노후", "창 주변 빗물 유입"], method: ["기존 실리콘 제거", "틈 청소·건조", "프라이머 후 새 실리콘(코킹) 시공"], risk: "벽 안으로 물이 스며 곰팡이·벽지 손상이 생길 수 있어요.", severity: "mid" },
+  MOLD: { problems: ["벽·천장 곰팡이", "겨울철 결로"], method: ["곰팡이 원인(결로·누수) 구분", "곰팡이 제거·살균", "단열 보강 또는 결로 방지 처리", "도배·도장 마감"], risk: "곰팡이가 퍼지고 호흡기 건강에 나쁠 수 있어요.", severity: "mid" },
+  WINDOW: { problems: ["창문 틈 외풍", "노후 창호"], method: ["창호 상태·크기 실측", "기존 창 철거", "새 창호 설치", "주변 마감·실리콘"], risk: "난방비가 많이 들고 결로가 계속 생겨요.", severity: "low" },
+  BOILER: { problems: ["난방·온수 불량"], method: ["고장 원인 점검(부품·배관)", "수리 또는 교체 결정", "설치 후 가스 누설·배기 점검"], risk: "겨울철 동파나 일산화탄소 위험이 있을 수 있어요.", severity: "high" },
+  PIPE_LEAK: { problems: ["배관 누수 의심", "바닥 습기·수도요금 증가"], method: ["누수 탐지(장비)", "누수 부위 바닥·벽 개방", "배관 교체·보수", "바닥·마감 복구"], risk: "아랫집 피해와 바닥 썩음이 생길 수 있어요.", severity: "high" },
+  BATH_KITCHEN: { problems: ["타일 깨짐·들뜸", "욕실 바닥 누수 의심"], method: ["손상 범위 확인", "타일 철거", "방수층 재시공", "타일·위생기구 시공"], risk: "아래층 누수와 미끄럼 사고가 생길 수 있어요.", severity: "mid" },
+  WALLPAPER_FLOOR: { problems: ["벽지 들뜸·장판 찢어짐"], method: ["기존 벽지·장판 제거", "바탕 정리", "새 벽지·장판 시공"], risk: "곰팡이가 숨어 있으면 다시 들뜰 수 있어요.", severity: "low" },
+  ELECTRIC: { problems: ["차단기 떨어짐·콘센트 이상"], method: ["누전·과부하 점검", "노후 배선·차단기 교체", "절연 측정"], risk: "누전으로 화재·감전 위험이 있어요.", severity: "high" },
+  ROOF_SLATE: { problems: ["노후 슬레이트(석면 가능성)"], method: ["석면 함유 여부 조사", "등록 업체가 석면 해체·제거", "새 지붕재 시공"], risk: "깨진 석면 슬레이트는 가루가 날려 건강에 해로워요.", severity: "mid" },
+  ACCESS: { problems: ["미끄러짐·문턱 등 이동 불편"], method: ["생활 동선 확인", "안전손잡이·미끄럼 방지 시공", "문턱 제거·경사로 설치"], risk: "낙상 사고 위험이 계속돼요.", severity: "mid" },
+  STORE: { problems: ["영업장 시설 노후"], method: ["현장 실측·요구 확인", "철거", "설비·마감 시공"], risk: "영업에 지장이 생길 수 있어요.", severity: "low" },
+};
+
 export function keywordDiagnose(text: string, works: WorkType[]): Diagnosis {
   const t = (text || "").replace(/\s+/g, " ");
   let best = "OTHER", bestScore = 0;
@@ -34,7 +51,9 @@ export function keywordDiagnose(text: string, works: WorkType[]): Diagnosis {
       : `말씀하신 증상은 보통 '${w?.name}' 공사로 해결해요. 정확한 원인은 업체 현장 확인으로 정해집니다.`,
     confidence: bestScore >= 2 ? 0.7 : bestScore === 1 ? 0.5 : 0.2,
     questions: best === "OTHER" ? ["어디에서(천장·벽·바닥·창문) 문제가 생겼나요?", "언제부터, 비 올 때만 그런가요?"] : [],
-    urgent: /누전|타|불꽃|가스 냄새|무너/.test(t),
+    urgent: /누전|타는|불꽃|가스 냄새|무너/.test(t),
     source: "keyword",
+    problems: WORK_INFO[best]?.problems, cause: w?.defect_hint || undefined,
+    method: WORK_INFO[best]?.method, risk: WORK_INFO[best]?.risk, severity: WORK_INFO[best]?.severity,
   };
 }

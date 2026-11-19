@@ -5,10 +5,11 @@ import { LoginBox, useProfile } from "@/components/Auth";
 import { LegalList, ProgramCard } from "@/components/Cards";
 import type { Business, LegalNote, Program, WorkType } from "@/lib/types";
 import { HOUSING, FLOORS, won } from "@/lib/types";
+import type { Diagnosis } from "@/lib/types";
 
 type MyQuote = { price_min: number; price_max: number; visit: string | null; period: string | null; message: string | null; status: string };
 type Req = { id: string; created_at: string; work_code: string; work_name: string; housing: string; floors: string | null; dong: string | null; text: string | null;
-  photo: string | null; diagnosis: { plain_explain?: string; defect?: string } | null; status: string; quote_count: number; my_quote: MyQuote | null;
+  photo: string | null; diagnosis: Diagnosis | null; status: string; quote_count: number; my_quote: MyQuote | null;
   citizen_name: string | null; citizen_phone: string | null };
 
 function ago(t: string) { const m = Math.round((Date.now() - +new Date(t)) / 60000); return m < 60 ? `${m}분 전` : m < 1440 ? `${Math.round(m / 60)}시간 전` : `${Math.round(m / 1440)}일 전`; }
@@ -114,6 +115,13 @@ export default function ProPage() {
                     {r.diagnosis?.defect && <> · AI 추정: {r.diagnosis.defect}</>}</div>
                 </div>
               </div>
+              {r.diagnosis && (r.diagnosis.problems?.length || r.diagnosis.method?.length) ? (
+                <details style={{ marginTop: 8 }}><summary className="small" style={{ cursor: "pointer", fontWeight: 700 }}>AI 진단 보기 (보이는 문제·추정 원인)</summary>
+                  <div className="small" style={{ marginTop: 6 }}>
+                    {r.diagnosis.problems?.length ? <p style={{ margin: "0 0 4px" }}><b>보이는 문제:</b> {r.diagnosis.problems.join(", ")}</p> : null}
+                    {r.diagnosis.cause && <p style={{ margin: "0 0 4px" }}><b>추정 원인:</b> {r.diagnosis.cause}</p>}
+                    {r.diagnosis.questions?.length ? <p style={{ margin: 0 }}><b>시민에게 확인할 것:</b> {r.diagnosis.questions.join(" / ")}</p> : null}
+                  </div></details>) : null}
               {r.my_quote && (
                 <div className={`mine ${chosenMe ? "won" : r.my_quote.status === "declined" ? "lost" : ""}`}>
                   {chosenMe ? <>🎉 시민이 우리 업체를 골랐어요 → <b>{r.citizen_name}</b> <a href={`tel:${r.citizen_phone}`}><b>{r.citizen_phone}</b></a> 방문 일정을 잡아 주세요.</>

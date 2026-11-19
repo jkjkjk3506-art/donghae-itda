@@ -1,4 +1,6 @@
 "use client";
+import { useState } from "react";
+import ProgramDetail from "./ProgramDetail";
 import type { Business, LegalNote, Program } from "@/lib/types";
 import { applyStatus } from "@/lib/types";
 
@@ -28,6 +30,7 @@ export function LegalList({ notes }: { notes: LegalNote[] }) {
 }
 
 export function ProgramCard({ p, why }: { p: Program; why?: string }) {
+  const [open_, setOpen] = useState(false);
   const st = applyStatus(p);
   const open = st.tone === "open" || st.tone === "always";
   return (
@@ -46,10 +49,11 @@ export function ProgramCard({ p, why }: { p: Program; why?: string }) {
         <dt>신청</dt><dd>{p.apply_where || "-"}</dd>
         {p.contact && <><dt>문의</dt><dd><b>{p.contact}</b></dd></>}
       </dl>
-      <div className="row" style={{ gap: 12, marginTop: 8 }}>
-        {p.official_source_url?.[0] && <a className="small" href={p.official_source_url[0]} target="_blank" rel="noreferrer">공고 원문 보기 →</a>}
-        {(p.notice_files || []).map((f) => <a key={f.path} className="small" href={f.url} target="_blank" rel="noreferrer">📄 {f.name}</a>)}
+      <div className="row" style={{ gap: 10, marginTop: 10 }}>
+        <button className="btn sm sea" onClick={() => setOpen(true)}>자세히 보기</button>
+        {p.official_source_url?.[0] && <a className="small" href={p.official_source_url[0]} target="_blank" rel="noreferrer">공고 원문 →</a>}
       </div>
+      {open_ && <ProgramDetail p={p} why={why} onClose={() => setOpen(false)} />}
     </div>
   );
 }

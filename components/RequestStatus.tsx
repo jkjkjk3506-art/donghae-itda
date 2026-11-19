@@ -6,6 +6,7 @@ import { pickLegal } from "@/lib/match";
 import type { LegalNote, Program, Quote, RequestView } from "@/lib/types";
 import { HOUSING, FLOORS, won } from "@/lib/types";
 import { LegalList, ProgramCard } from "./Cards";
+import DiagnosisCard from "./DiagnosisCard";
 
 const BIG_JOB = 1500; // 만원: 전문공사 면허 기준
 
@@ -69,6 +70,11 @@ export default function RequestStatus({ token }: { token: string }) {
         <div className={chosen ? "on" : ""}><b>3</b>업체 선택</div>
         <div><b>4</b>방문·계약</div>
       </div>
+
+      {r.diagnosis && <details className="card flat" style={{ marginBottom: 14 }}>
+        <summary style={{ cursor: "pointer", fontWeight: 700 }}>내 요청서 · AI 진단 다시 보기</summary>
+        <div style={{ marginTop: 10 }}><DiagnosisCard d={r.diagnosis} workCode={r.work_code} workName={r.work_name} photo={r.photo} compact /></div>
+      </details>}
 
       {chosen ? (
         <div className="card chosen">
