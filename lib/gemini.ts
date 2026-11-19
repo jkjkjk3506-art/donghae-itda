@@ -2,21 +2,31 @@ import type { Diagnosis, WorkType } from "./types";
 
 const BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
-const TEXT_MODELS = ["gemini-3.5-flash", "gemini-3-flash-preview", "gemini-2.5-flash"];
+const TEXT_MODELS = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-3.5-flash-lite"];
 const IMAGE_MODELS = ["gemini-3.1-flash-image", "gemini-3.1-flash-lite-image", "gemini-2.5-flash-image"];
 
 /** 모델명이 바뀌거나 내려가도 다음 후보로 넘어가도록 순서대로 시도 */
-async function callGemini(models: (string | undefined)[], key: string, body: unknown, timeout: number) {
+async function callGemini(models: (string | undefined)[], key: string, body: unknown, budgetMs: number) {
   const list = [...new Set(models.filter(Boolean) as string[])];
+  const end = Date.now() + budgetMs;
   let last = "";
-  for (const model of list) {
-    const res = await fetch(`${BASE}/${model}:generateContent`, {
-      method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-      body: JSON.stringify(body), signal: AbortSignal.timeout(timeout),
-    });
-    if (res.ok) return { json: await res.json(), model };
-    last = `${model} ${res.status}: ${(await res.text()).slice(0, 200)}`;
-    if ([401, 403].includes(res.status)) break; // 키 문제만 중단, 모델 없음·한도·과부하(503)는 다음 후보로
+  for (let i = 0; i < list.length; i++) {
+    const model = list[i];
+    const left = end - Date.now();
+    if (left < 2500) break;
+    // 남은 시간을 남은 후보에 나눠 줌 (한 모델이 오래 걸려도 다음 모델을 시도할 수 있게)
+    const slice = i === list.length - 1 ? left : Math.max(6000, Math.floor(left / (list.length - i)) + 2000);
+    try {
+      const res = await fetch(`${BASE}/${model}:generateContent`, {
+        method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify(body), signal: AbortSignal.timeout(Math.min(slice, left)),
+      });
+      if (res.ok) return { json: await res.json(), model };
+      last = `${model} ${res.status}: ${(await res.text()).slice(0, 160)}`;
+      if ([401, 403].includes(res.status)) break; // 키 문제만 중단
+    } catch (e) {
+      last = `${model} ${e instanceof Error ? e.name : "error"}`;
+    }
   }
   throw new Error("Gemini 실패 " + last);
 }
@@ -73,7 +83,7 @@ ${list}
           required: ["work_code", "defect", "plain_explain", "confidence", "questions", "urgent", "problems", "cause", "method", "risk", "severity"],
         },
       },
-    }, 20000);
+    }, 24000);
   const out = j?.candidates?.[0]?.content?.parts?.find((p: { text?: string }) => p.text)?.text;
   const d = JSON.parse(out);
   const w = works.find((x) => x.code === d.work_code) || works.find((x) => x.code === "OTHER")!;
