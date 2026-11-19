@@ -16,7 +16,7 @@ async function callGemini(models: (string | undefined)[], key: string, body: unk
     });
     if (res.ok) return { json: await res.json(), model };
     last = `${model} ${res.status}: ${(await res.text()).slice(0, 200)}`;
-    if (![400, 404, 429].includes(res.status)) break; // 모델 없음·모델별 한도 초과면 다음 후보로, 키 오류면 중단
+    if ([401, 403].includes(res.status)) break; // 키 문제만 중단, 모델 없음·한도·과부하(503)는 다음 후보로
   }
   throw new Error("Gemini 실패 " + last);
 }
